@@ -14,7 +14,8 @@ public class checkers
 
 class okno extends Frame implements ActionListener
 {
-    	Button bNowa;
+    	Plansza plansza;
+        Button bNowa;
         Button bZasad;
 		
 	public okno(String Nazwa, int szer, int wys)
@@ -22,6 +23,8 @@ class okno extends Frame implements ActionListener
                 super(Nazwa);
 		setLayout(null);
 		
+                plansza = new Plansza();
+
 		setSize(szer,wys);
 		setLocation(10,10);
 		setFont(new Font("Arial",0,16));
@@ -38,7 +41,9 @@ class okno extends Frame implements ActionListener
    
                 bNowa = new Button("Nowa gra");
 		bNowa.setSize(100,25);
-		bNowa.setLocation(450,90);	
+		bNowa.setLocation(450,90);
+                bNowa.addActionListener(this);	
+
                 add(bNowa);
                 
 		bZasad = new Button("Zasady gry");
@@ -79,6 +84,125 @@ class okno extends Frame implements ActionListener
                               
                    pole1.setText(s);
                    add(pole1);
+                   repaint();
+		}
+                
+	}
+        
+              public void paint(Graphics g)
+	{
+		RysujPlansze(g);
+	}	
+	
+	public void RysujPlansze(Graphics g)
+	{	
+		Image img = createImage(getSize().width,getSize().height);
+		
+		Graphics2D g2 = (Graphics2D) img.getGraphics();
+		
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		
+                
+		g2.setColor(Color.black);
+		g2.fillRect(18,38,322,322);	
+				
+		for (int j = 0; j < 8; j++)
+		{
+			for (int i = 0; i < 8; i++)	
+			{
+                            //WyĹ›wietlenie szachownicy
+				if (plansza.pole[i][j] == 0) 
+					g2.setColor(new Color(0,0,0)); 
+				else 
+					g2.setColor(new Color(255,255,255)); 			
+				g2.fillRect(20 + 40*i, 40 + 40*j,38,38);	
+                          
+			    //wyĹ›wietlenie pionkĂłw
+				if (plansza.pole[i][j] > 1) 
+				{
+					g2.setColor(Color.black);
+					g2.fillOval(21 + 40*i, 41 + 40*j,36,36);
+					
+					if (plansza.pole[i][j] == 2 || plansza.pole[i][j] == 4) 
+						g2.setColor(new Color(255,0,0)); //245, 240, 240
+					if (plansza.pole[i][j] == 3 || plansza.pole[i][j] == 5) 
+						g2.setColor(new Color(0,255,0)); //215, 95, 95
+						
+					g2.fillOval(23 + 40*i, 43 + 40*j,32,32);
+					
+					if (plansza.pole[i][j] == 4 || plansza.pole[i][j] == 5) 
+					{
+						g2.setColor(Color.black);
+						g2.fillOval(26 + 40*i, 46 + 40*j,26,26);	
+					}
+					
+				}
+			     			
+			}
+		}
+
+
+		g.drawImage(img,0,0,this);
+		
+	
+		
+	}
+	
+        
+class Tablica
+{
+	public int pole[][];
+	
+	public Tablica()
+	{
+		pole = new int[8][8];
+		this.zerowanie();
+	}
+	
+	public void zerowanie()
+	{		
+		for (int j = 0; j < 8; j++)
+		{
+			for (int i = 0; i < 8; i++)			
+			{
+				pole[i][j] = 0;	
+			}
 		}
 	}
+}
+
+class Plansza extends Tablica
+{
+	public Plansza(){}	
+//k=1 jasne, k=0 ciemne (pola szachownicy)
+	public void zerowanie()
+	{
+		int k = 1;
+		for (int j = 0; j < 8; j++)	
+		{
+			k = (k + 1) % 2;
+			for (int i = 0; i < 8; i++)
+			{	
+				pole[i][j] = k;
+				k = (k + 1) % 2;
+			}
+		}		
+	}
+        
+	//ustawienie pionkĂłw na szachownicy
+	public void rozpoczecie()
+	{
+		zerowanie();
+	//	gracz 2 - gora planszy
+		for (int j = 0; j < 3; j++)	
+			for (int i = 0; i < 8; i++)
+				if (pole[i][j] == 1) pole[i][j] = 3;
+	
+	//	gracz 1 - dol planszy		
+		for (int j = 5; j < 8; j++)	
+			for (int i = 0; i < 8; i++)
+				if (pole[i][j] == 1) pole[i][j] = 2;
+	}
+}
+  
 }
